@@ -1,0 +1,21 @@
+version: "3.9"
+
+services:
+  app_vehicle_auction:
+    build: .
+    container_name: ${CONTAINER_NAME}
+    image: ${IMAGE_NAME}
+    command: uvicorn main:app --host ${SERVER_HOST} --port ${SERVER_PORT} --reload
+    env_file:
+      - .env  
+    ports:
+      - "${SERVER_PORT}:${SERVER_PORT}"
+    volumes:
+      - .:/app
+    networks:
+      - app_network
+    restart: always
+
+networks:
+  app_network:
+    driver: bridge
