@@ -44,6 +44,7 @@ async def init(test: bool, loop: asyncio.AbstractEventLoop = asyncio.get_event_l
     if db_name is not None:
         await init_beanie(database=client[db_name], document_models=[
             "employee.model.Employee",
+            "driver.model.Driver",
             
         ],
         allow_index_dropping=True,

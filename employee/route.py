@@ -21,7 +21,7 @@ async def get_all_employee(request: Request):
         
         
         return utils.create_response(
-                status_code=201,
+                status_code=200,
                 success=True,
                 message="All Employee has been fetched successfully",
                 data=[ResponseEmployeeDTO(**single_employee.dict()) for single_employee in all_employee]
@@ -34,7 +34,7 @@ async def get_all_employee(request: Request):
         )
     
     
-@router.post("/create_employee", status_code=200)
+@router.post("/create_employee", status_code=201)
 async def create_employee(request: Request, data: EmployeeDTO):
     
     try:
