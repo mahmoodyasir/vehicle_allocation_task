@@ -53,6 +53,6 @@
 
 2) #### If I work with a team, then we can connect Slack Bot with our git repository. In this way, if anyone pushes any code, or merges any branch we will be notified.
 
-3) #### We got configure Snyk with out repository. So, that any vulnerabilities or old packages can get detected automatically, also we could configure it to automate pull request with updated package versions.
+3) #### We could configure Snyk with out repository. So, that any vulnerabilities or old packages can get detected automatically, also we could configure it to automate pull request with updated package versions.
 
 4) #### Task for the project could be assigned to team and maintain via ClickUp or Jira Board.
