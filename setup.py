@@ -33,6 +33,9 @@ endpoints = [{
     "method": "POST",
     "regex": r"^\/allocation\/create_allocation$",
 }, {
+    "method": "GET",
+    "regex": r"^\/allocation\/get_allocation_by_ID($|\/|\?).*$",
+}, {
     "method": "PATCH",
     "regex": r"^\/allocation\/update_allocation($|\/|\?).*$",
 }, {

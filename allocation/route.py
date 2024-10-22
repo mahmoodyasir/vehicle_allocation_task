@@ -1,7 +1,7 @@
 import asyncio
 from uuid import UUID
-from fastapi import APIRouter
-from datetime import date
+from fastapi import APIRouter, Request
+from datetime import date, timedelta
 from utils import utils
 from vehicle.dto import ResponseVehicleDTO
 from .dto import CreateAllocationDTO, UpdateAllocationDTO, ResponseAllocationDTO
@@ -9,6 +9,9 @@ from .model import Allocation
 from vehicle.model import Vehicle
 from employee.model import Employee
 from fastapi import Query
+from database.redis import client
+import json
+
 
 
 router = APIRouter(tags=["Allocation"])
@@ -67,12 +70,64 @@ async def create_allocation(data: CreateAllocationDTO):
             success=False,
             message=str(e)
         )
+        
+        
+
+@router.get("/get_allocation_by_ID/{allocation_id}", status_code=200)
+async def get_allocation_by_ID(allocation_id: UUID):
+    
+    try:
+        # Setting up the key for redis cache
+        cache_key = f"allocation:{allocation_id}"
+        
+        # Getting the value as per key from redis client
+        cached_allocation = client.get(str(cache_key))
+        
+        if cached_allocation:
+            allocation = json.loads(cached_allocation)
+            return utils.create_response(
+                status_code=200,
+                success=True,
+                message="All Driver has been fetched successfully",
+                data=allocation
+        )
+            
+        else:
+            # Getting allocation by an allocation UUID
+            allocation = await Allocation.get(allocation_id, fetch_links=True)
+            
+            if not allocation:
+                raise Exception("No Allocation Found")
+            
+            # Setting up the Allocation value in cache at redis client
+            client.set(
+                name=str(cache_key),
+                value=json.dumps(ResponseAllocationDTO(**allocation.dict()).model_dump(), default=utils.default_converter),
+                ex=timedelta(minutes=30)
+            ) 
+        
+            return utils.create_response(
+                    status_code=200,
+                    success=True,
+                    message="All Driver has been fetched successfully",
+                    data=ResponseAllocationDTO(**allocation.dict()).model_dump()
+            )
+    except Exception as e:
+        return utils.create_response(
+            status_code=500,
+            success=False,
+            message=str(e)
+        )
+    
 
 
 
 @router.patch("/update_allocation/{allocation_id}", status_code=200)
 async def update_allocation(allocation_id: UUID, data: UpdateAllocationDTO):
     try:
+        cache_key = f"allocation:{allocation_id}"
+        cached_allocation = client.get(str(cache_key))
+        
         # Fetch the allocation to be updated
         # fetch_links used so that I can get Linked Objects Employee and Vehicle from dbRef of each Allocation
         allocation = await Allocation.get(allocation_id, fetch_links=True)
@@ -121,6 +176,14 @@ async def update_allocation(allocation_id: UUID, data: UpdateAllocationDTO):
             allocation.vehicle = vehicle
             
         await allocation.save()
+        
+        # If this data is already in cache, then updating it's value
+        if cached_allocation:
+            client.set(
+                name=str(cache_key),
+                value=json.dumps(ResponseAllocationDTO(**allocation.dict()).model_dump(), default=utils.default_converter),
+                ex=timedelta(minutes=30)
+            )
 
         return utils.create_response(
             status_code=200,
