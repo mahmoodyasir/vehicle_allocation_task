@@ -35,7 +35,13 @@ endpoints = [{
 }, {
     "method": "PATCH",
     "regex": r"^\/allocation\/update_allocation($|\/|\?).*$",
-}, ]
+}, {
+    "method": "DELETE",
+    "regex": r"^\/allocation\/delete_allocation($|\/|\?).*$",
+}, {
+    "method": "GET",
+    "regex": r"^\/allocation\/allocation_history$",
+},]
 
 
 prod = os.environ.get("PRODUCTION", "false")
