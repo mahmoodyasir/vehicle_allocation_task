@@ -16,7 +16,7 @@ router = APIRouter(tags=["Employee"])
 async def get_all_employee(request: Request):
     
     try:
-        
+        # Getting all employee
         all_employee = await Employee.find().to_list()
         
         
@@ -38,6 +38,7 @@ async def get_all_employee(request: Request):
 async def create_employee(request: Request, data: EmployeeDTO):
     
     try:
+        # Creating a Employee Object for later saving it to Employee Collection
         employee = Employee(
             name=data.name,
             age=data.age,

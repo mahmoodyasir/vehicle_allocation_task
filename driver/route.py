@@ -13,6 +13,7 @@ async def get_all_driver(request: Request):
     
     try:
         
+        # Getting all the driver
         all_driver = await Driver.find().to_list()
         
         
@@ -34,6 +35,7 @@ async def get_all_driver(request: Request):
 async def create_driver(request: Request, data: DriverDTO):
     
     try:
+        # Creating a Driver Object for later saving it to Driver Collection
         driver = Driver(
             name=data.name,
             age=data.age,

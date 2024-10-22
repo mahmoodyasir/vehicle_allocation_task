@@ -18,26 +18,36 @@ router = APIRouter(tags=["Allocation"])
 @router.post("/create_allocation", status_code=201)
 async def create_allocation(data: CreateAllocationDTO):
     try:
+        
+        # Checking if the allocation date is in the past
         if data.allocation_date < date.today():
             raise Exception("Cannot create an allocation with a past date.")
         
+        # Fetching employee, vehicle, and existing allocation concurrently.
+        # await asyncio.gather() is much faster then separate data getting by await
         employee, vehicle, existing_allocation = await asyncio.gather(
             Employee.get(data.employee),
             Vehicle.get(data.vehicle, fetch_links=True),
             Allocation.find_one(Allocation.vehicle.id == data.vehicle, Allocation.allocation_date == data.allocation_date)
         )
         
+        # Checking if the vehicle is already allocated on the specified date
         if existing_allocation is not None:
             raise Exception(f"Vehicle is already allocated to another employee at this day {data.allocation_date} .")
         
+        # Validate that the employee exists
         if not employee:
             raise Exception("Employee not found.")
         
+        # Validate that the vehicle exists
         if not vehicle:
             raise Exception("Vehicle not found.")
         
         
+        # Excluding employee and vehicle references, only keeping the allocation_date
         allocation_data = data.model_dump(exclude={"employee", "vehicle"})
+        
+        # Creating the allocation object with the fetched employee and vehicle
         allocation = Allocation(**allocation_data, employee=employee, vehicle=vehicle)
         
         
@@ -63,32 +73,43 @@ async def create_allocation(data: CreateAllocationDTO):
 @router.patch("/update_allocation/{allocation_id}", status_code=200)
 async def update_allocation(allocation_id: UUID, data: UpdateAllocationDTO):
     try:
+        # Fetch the allocation to be updated
+        # fetch_links used so that I can get Linked Objects Employee and Vehicle from dbRef of each Allocation
         allocation = await Allocation.get(allocation_id, fetch_links=True)
         if not allocation:
             raise Exception("Allocation not found.")
-
+        
+        # Ensuring that the allocation date has not passed
         if allocation.allocation_date < date.today():
             raise Exception("Cannot update an allocation after the allocation date.")
 
+        # Dumping data to updated_data
         update_data = data.model_dump(exclude_unset=True)
 
+        # If employee UUID is provided, then validating and updating the employee of allocation object
         if "employee" in update_data:
             employee = await Employee.get(update_data["employee"])
             if not employee:
                 raise Exception("Employee not found.")
             allocation.employee = employee
             
+        # If allocation_date is provided, then validating and updating the allocation_date of allocation object
+        # Also checking if todays date is passed allocation_date during request.
         if "allocation_date" in update_data:
             if update_data["allocation_date"] < date.today():
                 raise Exception("Cannot set an allocation date in the past.")
             allocation.allocation_date = update_data["allocation_date"]
             
 
+        # If vehicle UUID is provided, then validating and updating the vehicle of allocation object
+        # Also checking if it is a valid vehicle UUID.
         if "vehicle" in update_data:
             vehicle = await Vehicle.get(update_data["vehicle"], fetch_links=True)
             if not vehicle:
                 raise Exception("Vehicle not found.")
             
+            # Checking for existing allocations for the vehicle on the same date for different allocation record
+            # If matches, then that vehicle is already assigned by an user at another allocation
             existing_allocation = await Allocation.find_one(
                 Allocation.vehicle.id == update_data["vehicle"],
                 Allocation.allocation_date == update_data["allocation_date"],
@@ -155,22 +176,28 @@ async def allocation_history(
         
         query_filters = {}
 
+        # Adding employee UUID to query filters if provided
         if employee_id:
             query_filters["employee._id"] = employee_id
         
+        # Adding vehicle UUID to query filters if provided
         if vehicle_id:
             query_filters["vehicle._id"] = vehicle_id
 
+        # Adding start_date filter if provided
         if start_date:
             query_filters["allocation_date"] = {"$gte": start_date}
         
+        # # Adding end_date filter if provided.
+        #  And, if start_date is also present then making query for filtering data between both dates
         if end_date:
             if "allocation_date" in query_filters:
                 query_filters["allocation_date"]["$lte"] = end_date
             else:
                 query_filters["allocation_date"] = {"$lte": end_date}
 
-   
+
+        # fetch_links used to get all the Linked object employee and vehicle from Allocation with the filtered query
         allocations = await Allocation.find_many(query_filters, fetch_links=True).to_list()
 
 
