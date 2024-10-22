@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from employee.route import router as employeeRouter
 from driver.route import router as driverRouter
 from vehicle.route import router as vehicleRouter
+from allocation.route import router as allocationRouter
 
 
 load_dotenv()
@@ -28,7 +29,13 @@ endpoints = [{
 }, {
     "method": "GET",
     "regex": r"^\/vehicle\/all_vehicle$",
-},]
+}, {
+    "method": "POST",
+    "regex": r"^\/allocation\/create_allocation$",
+}, {
+    "method": "PATCH",
+    "regex": r"^\/allocation\/update_allocation($|\/|\?).*$",
+}, ]
 
 
 prod = os.environ.get("PRODUCTION", "false")
@@ -53,6 +60,7 @@ def setup(app: FastAPI):
     app.include_router(employeeRouter, prefix=module_api_path+"/employee")
     app.include_router(driverRouter, prefix=module_api_path+"/driver")
     app.include_router(vehicleRouter, prefix=module_api_path+"/vehicle")
+    app.include_router(allocationRouter, prefix=module_api_path+"/allocation")
     
     
     

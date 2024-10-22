@@ -45,7 +45,8 @@ async def init(test: bool, loop: asyncio.AbstractEventLoop = asyncio.get_event_l
         await init_beanie(database=client[db_name], document_models=[
             "employee.model.Employee",
             "driver.model.Driver",
-            "vehicle.model.Vehicle"
+            "vehicle.model.Vehicle",
+            "allocation.model.Allocation"
             
         ],
         allow_index_dropping=True,
