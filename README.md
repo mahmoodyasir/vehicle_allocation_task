@@ -10,9 +10,13 @@
 
 2) ### `docker-compose up --build` run it on vs code or other IDE terminal
 
+3) ### Go to `http://localhost:8000/docs` to test the api
+
 ## `Linux`:
 
 1) ### `sudo docker-compose up --build` run it on vs code or other IDE terminal
+
+2) ### Go to `http://localhost:8000/docs` to test the api
 
 
 ## `Optional`:
