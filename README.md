@@ -31,7 +31,7 @@
 2) #### `pip install -r requirements.txt`
 
 
-## `Deploy` and `Maintain`:
+# `Deploy` and `Maintain`:
 
 ### `Deploy`:
 
