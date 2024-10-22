@@ -13,3 +13,15 @@
 ## `Linux`:
 
 1) ### `sudo docker-compose up --build` run it on vs code or other IDE terminal
+
+
+## `Optional`:
+
+#### You may create a `venv` (virtual environment) and install the package from requirements.txt file
+#### Doing so will remove the red mark or import error from text editor of any IDE.
+
+### To Do so: 
+
+1) #### `python -m venv venv`
+2) #### `venv\Scripts\activate`
+2) #### `pip install -r requirements.txt`
