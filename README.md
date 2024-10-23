@@ -35,6 +35,8 @@
 
 ### `Deploy`:
 
+## Site is already deployed on an aws ec2 instance. Go to [http://100.27.189.85/docs](http://100.27.189.85/docs)
+
 1) #### I could deploy the project on aws ec2 instance or lambda.
 2) #### Suppose for EC2 I will first create an instance
 3) #### That instance could be on amazon linux AMI or an Ubuntu Server
@@ -44,7 +46,7 @@
 7) #### Then, Install Docker and docker compose 
 8) #### Now, we can upload our code to ec2 instance using `scp` or using `git` clone.
 9) #### docker-compose up --build
-10) #### It will make the fastapi accessible publicly. Example: `http://ec2-public-ip:8000`
+10) #### It will make the fastapi accessible publicly. Example: `http://ec2-public-ip:80`
 
 
 ### `Maintain`
