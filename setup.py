@@ -47,19 +47,6 @@ endpoints = [{
 },]
 
 
-prod = os.environ.get("PRODUCTION", "false")
-if prod == "false":
-    endpoints += [{
-        "method": "GET",
-        "regex": r"^\/docs$",
-    }, {
-        "method": "GET",
-        "regex": r"^\/favicon.ico$",
-    }, {
-        "method": "GET",
-        "regex": r"^\/openapi.json$",
-    }]
-
 
 module_api_path = "/api/v1"
 
